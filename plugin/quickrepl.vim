@@ -14,10 +14,12 @@ const g:quickrepl_default_config = #{
 \ }
 
 let g:quickrepl_use_default_key_mapping = get(g:, 'quickrepl_use_default_key_mapping', v:false)
+let g:quickrepl_enable_debug = get(g:, 'quickrepl_enable_debug', v:false)
 
 " Key mapping
 
 function s:via_key() abort
+  call quickrepl#log('plugin', 'start via key')
   call quickrepl#open(quickrepl#get_current_config(), &filetype, 'vertical', [])
 endfunction
 
@@ -25,7 +27,9 @@ nnoremap <silent> <Plug>(quickrepl-open) :<C-u>call <SID>via_key()<CR>
 
 " Commands
 
-function s:via_cmd(mods, args) abort
+function s:via_cmd(mods, ...) abort
+  call quickrepl#log('plugin', 'start via cmd', a:mods, a:000)
+
   const mods = a:mods ==# ''
     \ ? 'vertical'
     \ : a:mods
@@ -34,7 +38,7 @@ function s:via_cmd(mods, args) abort
     \ quickrepl#get_current_config(),
     \ &filetype,
     \ mods,
-    \ a:args,
+    \ a:000,
   \ )
 endfunction
 

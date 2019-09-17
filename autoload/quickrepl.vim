@@ -2,6 +2,8 @@ scriptencoding utf-8
 scriptversion 3
 
 const s:V = vital#quickrepl#new()
+
+const s:List = s:V.import('Data.List')
 const s:Msg = s:V.import('Vim.Message')
 
 function quickrepl#get_current_config() abort
@@ -34,14 +36,6 @@ function quickrepl#open(config, filetype, mods, args) abort
   execute 'set filetype=' .. filetype
 endfunction
 
-function s:extend(xs) abort
-  let result = #{}
-  for x in a:xs
-    call extend(result, x)
-  endfor
-  return result
-endfunction
-
 function s:get_executable(config, filetype, args) abort
   if a:args !=# []
     if executable(a:args[0])
@@ -62,4 +56,27 @@ endfunction
 function s:is_executable(cmd) abort
   return (type(a:cmd) ==# v:t_string && executable(a:cmd)) ||
     \ (type(a:cmd) ==# v:t_list && executable(a:cmd[0]))
+endfunction
+
+function quickrepl#log(name, ...) abort
+  if g:quickrepl_enable_debug
+    const message = s:List.foldl({ x, y ->
+      \ x .. ', ' .. s:string(y)
+    \ }, '', a:000)
+    echomsg 'quickrepl>' .. a:name .. ': ' .. message
+  endif
+endfunction
+
+function s:extend(xs) abort
+  let result = #{}
+  for x in a:xs
+    call extend(result, x)
+  endfor
+  return result
+endfunction
+
+function s:string(x) abort
+  return type(a:x) ==# v:t_string
+    \ ? a:x
+    \ : string(a:x)
 endfunction
