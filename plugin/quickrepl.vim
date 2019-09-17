@@ -11,6 +11,7 @@ const g:loaded_vim_quickrepl = v:true
 const g:quickrepl_default_config = #{
   \ ruby: ['irb'],
   \ haskell: [['stack', 'ghci'], 'ghci'],
+  \ happy: [['stack', 'ghci'], 'ghci'],
 \ }
 
 let g:quickrepl_use_default_key_mapping = get(g:, 'quickrepl_use_default_key_mapping', v:false)
