@@ -43,7 +43,7 @@ function s:via_cmd(mods, ...) abort
   \ )
 endfunction
 
-command! -bar -nargs=? QuickReplOpen call s:via_cmd(<q-mods>, [<f-args>])
+command! -bar -nargs=* QuickReplOpen call s:via_cmd(<q-mods>, <f-args>)
 
 " Side effects for a user
 
