@@ -14,3 +14,22 @@ this often requires a configuration for unknown REPLs
 (e.g. `stack ghci`).
 
 vim-quickrepl focuses **simplicity** to configurate.
+
+## :dizzy: How to install :dizzy:
+
+### No package manager
+
+Clone this repo into `$MYVIMRC/pack/haskell/start/`
+
+### dein.nvim
+
+```haskell
+call dein#add('aiya000/vim-quickrepl')
+```
+
+### dein.nvim with toml
+
+```toml
+[[plugins]]
+repo = 'aiya000/vim-quickrepl'
+```
