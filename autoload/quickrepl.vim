@@ -19,8 +19,8 @@ endfunction
 
 function quickrepl#open(config, filetype, mods, args) abort
   const cmd = s:get_executable(a:config, a:filetype, a:args)
-  if type(cmd) ==# v:t_string
-    call s:Msg.error('quickrepl: ' .. cmd)
+  if type(cmd) ==# v:t_dict
+    call s:Msg.error('quickrepl: ' .. cmd.error)
     return
   endif
 
@@ -41,7 +41,7 @@ function s:get_executable(config, filetype, args) abort
     if executable(a:args[0])
       return a:args
     endif
-    return a:args[0] .. ' is not executable'
+    return #{error: a:args[0] .. ' is not executable'}
   endif
 
   for cmd in get(a:config, a:filetype, [])
@@ -50,7 +50,7 @@ function s:get_executable(config, filetype, args) abort
     endif
   endfor
 
-  return 'no config for fipetype: ' .. a:filetype
+  return #{error: 'no config for fipetype: ' .. a:filetype}
 endfunction
 
 function s:is_executable(cmd) abort
