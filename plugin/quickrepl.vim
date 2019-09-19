@@ -12,7 +12,8 @@ const g:quickrepl_default_config = #{
   \ ruby: ['irb'],
   \ haskell: [['stack', 'ghci'], 'ghci'],
   \ happy: [['stack', 'ghci'], 'ghci'],
-\ }
+  \ typescript: ['ts-node', 'tsun'],
+\ } | lockvar! g:quickrepl_default_config
 
 let g:quickrepl_use_default_key_mapping = get(g:, 'quickrepl_use_default_key_mapping', v:false)
 let g:quickrepl_enable_debug = get(g:, 'quickrepl_enable_debug', v:false)
