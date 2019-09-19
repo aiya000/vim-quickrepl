@@ -1,0 +1,195 @@
+*quickrepl.txt*	The fastest way to open your REPL for filetypes.
+
+Author  : aiya000
+License : MIT license  {{{
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+}}}
+
+==============================================================================
+CONTENTS					*quickrepl-contents*
+
+INTRODUCTION			|quickrepl-introduction|
+USAGE				|quickrepl-usage|
+INTERFACE			|quickrepl-interface|
+  VARIABLES			  |quickrepl-variables|
+  COMMANDS			  |quickrepl-commands|
+  KEY-MAPPINGS			  |quickrepl-key-mappings|
+  FUNCTIONS			  |quickrepl-functions|
+
+
+==============================================================================
+INTRODUCTION					*quickrepl-introduction*
+
+*quickrepl* allows you to open defined REPLs.
+
+Latest version:
+https://github.com/aiya000/quickrepl.vim
+
+
+==============================================================================
+USAGE						*quickrepl-usage*
+
+Let's call |QuickReplOpen|, |quickrepl#open()| or |<Plug>(quickrepl-open)|to
+open a REPL for the current filetype.
+
+>
+	:QuickReplOpen
+	:call quickrepl#open('vertical')
+	:execute 'normal' "\<Plug>(quickrepl-open)"
+<
+This looks up `g:quickrepl_default_config[&filetype]` and open found choice.
+
+e.g. `ghci` is opened if you doesn't have `stack` and you have `ghci`.
+>
+	const g:quickrepl_default_config = #{
+	  \ haskell: [['stack', 'ghci'], 'ghci'],
+	\ }
+<
+(Please do `:echo g:quickrepl_default_config` to check that actual value.)
+
+NOTE: Please don't define |g:quickrepl_default_config| yourself. You can
+define|g:quickrepl_config| with REPLs you like :D
+
+Or you can specify a command line instead of the current filetype. This
+requires no configurations.
+>
+	:QuickReplOpen npx ts-node
+	:call quickrepl#open('vertical', ['npx', 'ts-node'])
+<
+
+==============================================================================
+INTERFACE					*quickrepl-interface*
+
+------------------------------------------------------------------------------
+VARIABLES					*quickrepl-variables*
+
+g:quickrepl_default_config		*g:quickrepl_default_config*
+	type: dict of <string or list of <string>>
+
+	Known REPLs for |quickrepl#get_current_config()|. This is readonly
+	value.
+
+
+g:quickrepl_config			*g:quickrepl_config*
+	type: same as |g:quickrepl_default_config|
+
+	Please see |quickrepl#get_current_config()|for this usage.
+>
+	let g:quickrepl_config = #{
+	    \ 'typescript': ['npx', 'ts-node'],
+	\ }
+<
+
+g:quickrepl_use_default_key_mapping	*g:quickrepl_use_default_key_mapping*
+	type: boolean
+	default value: `v:false`
+
+	Define |quickrepl-default-key-mappings| if this is `v:true`.
+
+
+b:quickrepl_config			*b:quickrepl_config*
+	type: same as |g:quickrepl_default_config|
+
+	Buffers version |g:quickrepl_config|.
+
+------------------------------------------------------------------------------
+COMMANDS					*quickrepl-commands*
+
+:{mods} QuickReplOpen {repl-command}				*:QuickReplOpen*
+	A command version |quickrepl#open()|, this is same as
+>
+	:call quickrepl#open('vertical')
+<
+	But you can specify {mods}.
+>
+	:vertical QuickReplOpen
+	:top QuickReplOpen
+<
+	 Please see |mods|about :vertical, :top, and more.
+
+------------------------------------------------------------------------------
+KEY-MAPPINGS					*quickrepl-key-mappings*
+
+<Plug>(quickrepl-open)				*<Plug>(quickrepl-open)*
+	available mode: normal
+
+	A keymapping version |quickrepl#open()|. This is same as
+>
+	:call quickrepl#open('vertical')
+<
+
+						*quickrepl-default-key-mappings*
+	Please see |g:quickrepl_use_default_key_mapping|about this.
+
+default mappings
+normal mode
+{lhs}		{rhs}
+--------	------------------------
+<Localleader>R	<Plug>(quickrepl-open)
+
+
+------------------------------------------------------------------------------
+FUNCTIONS					*quickrepl-functions*
+
+						*quickrepl#open()*
+quickrepl#open(mods, ...)
+	- mods type: string ({mods})
+	- ... type: list of <string>
+
+	Same as
+>
+	call quickrepl#run(
+	  \ quickrepl#get_current_config(),
+	  \ &filetype,
+	  \ mods,
+	  \ a:000,
+	\ )
+<
+
+						*quickrepl#get_current_config()*
+quickrepl#get_current_config()
+	+ return type: same as |g:quickrepl_default_config|
+
+	Merges |g:quickrepl_default_config|, |g:quickrepl_config|, and
+	`get(b:, 'quickrepl_config', #{})` . Please see |quickrepl#open()|.
+
+
+						*quickrepl#run()*
+quickrepl#run(config, filetype, mods, args)
+	- config type: same as |quickrepl#get_current_config()|
+	- filetype type: string
+	- mods type: string ({mods})
+	- args type: list of <stirng>
+
+	Finds an executable, and opens the executable by :terminal with {mods}.
+
+	The finding sequence is
+	- 1. Use `args`if it is not `[]`and `args[0]` is executable.
+	- 2. Read `quickrepl#get_current_config()[&filetype][n]`from the head
+	  to the last, and use it if itself
+	  or`quickrepl#get_current_config()[&filetype][n][0]` is executable.
+	- 3. Or notify error.
+
+	This sets a filetype of the :terminal buffer to
+>
+	let &filetype = 'quickrepl-' .. join(args, '-')
+<
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:
