@@ -7,24 +7,40 @@ const s:List = s:V.import('Data.List')
 const s:Msg = s:V.import('Vim.Message')
 
 function quickrepl#get_current_config() abort
-  const quickrepl_user_config = get(g:, 'quickrepl_config', #{})
-  const quickrepl_user_buffer_config = get(b:, 'quickrepl_config', #{})
-
   return s:extend([
     \ g:quickrepl_default_config,
-    \ quickrepl_user_config,
-    \ quickrepl_user_buffer_config,
+    \ g:quickrepl_config,
+    \ get(b:, 'quickrepl_config', #{}),
   \ ])
 endfunction
 
-function quickrepl#open(config, filetype, mods, args) abort
+" A side effective main function.
+"
+" Users can use quickrepl#run() to specify detailed arguments.
+function quickrepl#open(mods, ...) abort
+  call quickrepl#log('plugin', 'started by ', a:mods, a:000)
+
+  const mods = a:mods ==# ''
+    \ ? 'vertical'
+    \ : a:mods
+
+  call quickrepl#run(
+    \ quickrepl#get_current_config(),
+    \ &filetype,
+    \ mods,
+    \ a:000,
+  \ )
+endfunction
+
+" A core function of vim-quickrepl
+function quickrepl#run(config, filetype, mods, args) abort
   const cmd = s:get_executable(a:config, a:filetype, a:args)
   if type(cmd) ==# v:t_dict
     call s:Msg.error('quickrepl: ' .. cmd.error)
     return
   endif
 
-  const filetype = 'quickrepl-' .. a:filetype
+  const filetype = 'quickrepl-' .. join(a:args, '-')
   call term_start(cmd, #{
     \ term_name: filetype,
     \ term_finish: 'close',
