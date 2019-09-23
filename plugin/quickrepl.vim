@@ -33,6 +33,7 @@ const g:quickrepl_default_config = #{
   \ ocaml: ['ocaml'],
   \ php: ['psysh', 'php'],
   \ prolog: ['swipl'],
+  \ purescript: ['psci'],
   \ python: ['ptpython', 'python3', 'python'],
   \ r: ['R'],
   \ racket: ['racket'],
