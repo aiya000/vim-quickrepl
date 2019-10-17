@@ -40,7 +40,7 @@ function quickrepl#run(config, filetype, mods, args) abort
     return
   endif
 
-  const filetype = 'quickrepl-' .. join(a:args, '-')
+  const filetype = s:make_repl_filetype_name(a:filetype, cmd, a:args)
   call term_start(cmd, #{
     \ term_name: filetype,
     \ term_finish: 'close',
@@ -50,6 +50,21 @@ function quickrepl#run(config, filetype, mods, args) abort
   execute a:mods 'split'
   execute 'buffer' term_bufnr
   execute 'set filetype=' .. filetype
+endfunction
+
+function s:make_repl_filetype_name(filetype, cmd, args) abort
+  const args = len(a:args) is 0
+    \ ? ''
+    \ : '-' .. join(a:args, '-')
+
+  const cmd = type(a:cmd) is v:t_string
+    \ ? a:cmd
+    \ : join(a:cmd, '-')
+
+  const text = 'quickrepl-' .. a:filetype .. '-' .. cmd .. args
+
+  " TODO: Fix for :QuickRepl stack ghci :tasty
+  return substitute(text, '[^a-zA-Z0-9-_]', '', 'g')
 endfunction
 
 function s:get_executable(config, filetype, args) abort
