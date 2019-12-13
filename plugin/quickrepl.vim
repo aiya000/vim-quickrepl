@@ -15,7 +15,7 @@ const g:quickrepl_default_config = #{
   \ crystal: ['icr'],
   \ csharp: ['csi'],
   \ elixir: ['iex'],
-  \ elm: ['elm_repl'],
+  \ elm: [['elm', 'repl']],
   \ erlang: ['erl'],
   \ fsharp: ['fsi'],
   \ go: ['go_pry'],
